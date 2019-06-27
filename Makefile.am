@@ -1,0 +1,5 @@
+
+AUTOMAKE_OPTIONS = gnu
+SUBDIRS = src
+ACLOCAL_AMFLAGS = -I m4
+EXTRA_DIST = samples
