@@ -1,5 +1,5 @@
 /*
-   Copyleft (C) 2019 Vincenzo Lo Cicero
+   Copyright (C) 2019 Vincenzo Lo Cicero
 
    Author: Vincenzo Lo Cicero.
    e-mail: vincenzolocicero68@gmail.com
