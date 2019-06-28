@@ -18,28 +18,28 @@ To build myoptParser use the following steps:
 
    1) Unzip and untar the distribution myoptparser-1.0.tar.gz source tarball:
    
-      $ tar -xvf libmysht-1.0.0.tar.gz
-      $ cd libmysht-1.0.0
+      - $ tar -xvf libmysht-1.0.0.tar.gz
+      - $ cd libmysht-1.0.0
  OR
 
    1) Use a git client to retrieve the source code anonymously from
       the project site. 
 
-      $ git clone https://github.com/Vincenzo1968/libmysht.git
-      $ cd libmysht
+      - $ git clone https://github.com/Vincenzo1968/libmysht.git
+      - $ cd libmysht
           
    2) Run the configure script to create libmysht Makefiles. If the configure
       script fails... now you have a problem.
      
-      $ ./configure --help          # (for available configuration options)
-      $ ./configure [--with-option1][--with-the-other-option]
+      - $ ./configure --help          # (for available configuration options)
+      - $ ./configure [--with-option1][--with-the-other-option]
 
       NOTE: You may also run configure from a different directory in order to
       keep your distribution clean, e.g.:
 
-      $ mkdir build
-      $ chdir build
-      $ ../configure [--with-option1][--with-the-other-option]
+      - $ mkdir build
+      - $ chdir build
+      - $ ../configure [--with-option1][--with-the-other-option]
           
    3) Run the top level Makefile:
     
