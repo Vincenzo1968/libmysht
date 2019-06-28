@@ -16,7 +16,7 @@ libmysht is a library that implement hashtable and scoped hashtable
 ------------------------
 To build libmysht use the following steps:
 
-   1) Unzip and untar the distribution myoptparser-1.0.tar.gz source tarball:
+   1) Unzip and untar the distribution libmysht-1.0.0.tar.gz source tarball:
    
       - $ tar -xvf libmysht-1.0.0.tar.gz
       - $ cd libmysht-1.0.0
