@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "myScopeHashTable.h"
 //#include "../src/myScopeHashTable.h"
@@ -71,8 +72,28 @@ int myCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint3
 	return res;
 }
 
+uint32_t MakeKey(const char* szFirstName, const char* szLastName, char* szKey)
+{
+	uint32_t k = 0;
+	
+	strncpy(szKey, szLastName, 127);
+	strncat(szKey, szFirstName, 127);
+		
+	while ( '\0' != szKey[k] )
+	{
+		szKey[k] = tolower( (int)szKey[k] );
+		k++;
+	}
+	
+	return k;
+}
+
 /*
 gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE ../src/myScopeHashTable.c sample03.c -o example03
+
+gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE -I/$HOME/MyLibs/libmysht/include -L/$HOME/MyLibs/libmysht/lib sample03.c -o example03 -lmysht
+export LD_LIBRARY_PATH=$HOME/MyLibs/libmysht/lib:$LD_LIBRARY_PATH
+./example03
 
 gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE sample03.c -o example03 -lmysht
 */
@@ -111,10 +132,8 @@ int main()
 	
 	for ( k = 0; k < 5; k++ )
 	{
-		strncpy(szKey, aPersons[k].szLastName, 127);
-		strncat(szKey, aPersons[k].szFirstName, 127);
-		sizekey = strnlen(szKey, 256);		
-		printf("SCOPE INSERT Key -> '%s', First Name = '%s', Last Name = '%s', Age = %d\n", szKey, aPersons[k].szFirstName, aPersons[k].szLastName, aPersons[k].nAge);
+		sizekey = MakeKey(aPersons[k].szFirstName, aPersons[k].szLastName, szKey);
+		printf("SCOPE INSERT Key -> ('%s'), First Name = '%s', Last Name = '%s', Age = %d\n", szKey, aPersons[k].szFirstName, aPersons[k].szLastName, aPersons[k].nAge);
 		scopeInsert(&myScope, szKey, sizekey, &(aPersons[k]), sizeof(Person_t));
 		
 		if ( 2 == k )
@@ -127,29 +146,26 @@ int main()
 	printf("----------------------------------------------------------------------------------------\n");
 	
 	
-	strcpy(szKey, "DeppJohnny");
-	sizekey = strlen(szKey) + sizeof(char);	
+	sizekey = MakeKey("Johnny", "Depp", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
 	if ( res >= 0 )
-		printf("Record '%s' find: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
+		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not find.\n", szKey);
+		printf("Record Key('%s') not found.\n", szKey);
 
-	strcpy(szKey, "CruiseTom");
-	sizekey = strlen(szKey) + sizeof(char);	
+	sizekey = MakeKey("Tom", "Cruise", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
 	if ( res >= 0 )
-		printf("Record '%s' find: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
+		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not find.\n", szKey);
+		printf("Record Key('%s') not found.\n", szKey);
 		
-	strcpy(szKey, "De NiroRobert");
-	sizekey = strlen(szKey) + sizeof(char);	
+	sizekey = MakeKey("Robert", "De Niro", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
 	if ( res >= 0 )
-		printf("Record '%s' find: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
+		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not find.\n", szKey);		
+		printf("Record Key('%s') not found.\n", szKey);		
 
 		
 	printf("----------------------------------------------------------------------------------------\n");
@@ -160,29 +176,26 @@ int main()
 		
 	printf("After scopePop:\n");
 	
-	strcpy(szKey, "DeppJohnny");
-	sizekey = strlen(szKey) + sizeof(char);	
+	sizekey = MakeKey("Johnny", "Depp", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
 	if ( res >= 0 )
-		printf("Record '%s' find: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
+		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not find.\n", szKey);
+		printf("Record '%s' not found.\n", szKey);
 
-	strcpy(szKey, "CruiseTom");
-	sizekey = strlen(szKey) + sizeof(char);	
+	sizekey = MakeKey("Tom", "Cruise", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
 	if ( res >= 0 )
-		printf("Record '%s' find: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
+		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not find.\n", szKey);
+		printf("Record Key('%s') not found.\n", szKey);
 		
-	strcpy(szKey, "De NiroRobert");
-	sizekey = strlen(szKey) + sizeof(char);	
+	sizekey = MakeKey("Robert", "De Niro", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
 	if ( res >= 0 )
-		printf("Record '%s' find: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
+		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not find.\n", szKey);
+		printf("Record Key('%s') not found.\n", szKey);
 	
 	printf("\n");
 				
