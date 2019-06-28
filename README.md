@@ -2,19 +2,19 @@
 C library for generic hashtable and scope handling
 
 libmysht README
-==================
+===============
 
-1 - Introduction
-2 - Building libmysht 
-3 - Installing libmysht 
+- 1 - Introduction
+- 2 - Building libmysht 
+- 3 - Installing libmysht 
 
 1 - Introduction
 ----------------
 libmysht is a library that implement hashtable and scoped hashtable
 
-2 - Building myoptParser
+2 - Building libmysht
 ------------------------
-To build myoptParser use the following steps:
+To build libmysht use the following steps:
 
    1) Unzip and untar the distribution myoptparser-1.0.tar.gz source tarball:
    
@@ -28,9 +28,8 @@ To build myoptParser use the following steps:
       - $ git clone https://github.com/Vincenzo1968/libmysht.git
       - $ cd libmysht
           
-   2) Run the configure script to create libmysht Makefiles. If the configure
-      script fails... now you have a problem.
-     
+   2) Run the configure script to create libmysht Makefiles.
+   
       - $ ./configure --help          # (for available configuration options)
       - $ ./configure [--with-option1][--with-the-other-option]
 
