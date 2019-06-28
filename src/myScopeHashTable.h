@@ -115,9 +115,9 @@ int StringCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, u
 
 // ----------------------------------------------- Scope Functions -------------------------------------------------
 
-int  scopeInit(Scope* pScope);
+int  scopeInit(Scope* pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc);
 void scopeFree(Scope* pScope);
-int  scopePush(Scope* pScope);
+int scopePush(Scope *pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc);
 int  scopePop(Scope* pScope);
 int  scopeFind(Scope* pScope, void* pKey, uint32_t keysize, void* pData, uint32_t* datasize, int bOnlyTop);
 int  scopeInsert(Scope* pScope, void* pKey, uint32_t keysize, void* pData, uint32_t datasize);

@@ -23,20 +23,36 @@
 #include <string.h>
 
 #include "myScopeHashTable.h"
+//#include "../src/myScopeHashTable.h"
+
+
+int myHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+	unsigned n = 0;
+	const char* s = (const char*)pKey;
+	
+	UNUSED(keysize);
+	
+	for ( ; *s; s++)
+		n = 31 * n + *s;
+		
+	return n % p->htSize;
+}
+
+
+int myCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint32_t keysize2)
+{
+	UNUSED(keysize1);
+	UNUSED(keysize2);
+	
+	return strncmp((char*)pKey1, (char*)pKey2, BLOCK_SIZE - 1);
+}
 
 /*
+gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE ../src/myScopeHashTable.c sample01.c -o example01 
+
 gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE sample01.c -o example01 -lmysht
 */
-
-int myOnTraverse(const void* key, uint32_t keySize, void* data, uint32_t dataSize)
-{
-	if ( NULL != data )
-		printf("'%s' keysize = %d <-> '%s' dataSize = %d\n", (char*)key, keySize, (char*)data, dataSize);
-	else
-		printf("'%s' keysize = %d\n", (char*)key, keySize);
-				
-	return 1;
-}
 
 int main()
 {
@@ -50,7 +66,7 @@ int main()
 	
 	int res;
 		
-	if ( !scopeInit(&myScope) )
+	if ( !scopeInit(&myScope, 0, myHashFunc, myCompareFunc) )
 	{
 		printf("Errore scopeInit.\n");
 		return -1;		
@@ -83,7 +99,7 @@ int main()
 	scopeInsert(&myScope, szKey, sizekey, szData, sizedata);
 	
 	printf("SCOPE PUSH\n");
-	scopePush(&myScope);
+	scopePush(&myScope, 0, myHashFunc, myCompareFunc);
 	
 	strcpy(szKey, "Ciao a tutti");
 	sizekey = strlen(szKey) + sizeof(char);

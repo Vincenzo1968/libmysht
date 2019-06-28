@@ -26,6 +26,116 @@
 
 #include "myScopeHashTable.h"
 
+/*
+int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+	int index = 0;
+	int a = 31415;
+	const char* s = (const char*)pKey;
+	
+	for(; *s; s++)
+		index = (a*index + *s) % p->htSize;
+				
+	return index;	
+}
+*/
+
+/*
+int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+    const unsigned char *s = pKey;
+    unsigned h = 0;
+    uint32_t i;
+
+    for (i = 0; i < keysize - 1; i++)
+    {
+        h ^= (h << 5) + (h >> 2) + s[i];
+    }
+
+    return h % p->htSize;
+}
+*/
+
+/*
+int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+    const unsigned char *s = pKey;
+    unsigned h = 0;
+    uint32_t i;
+
+    for (i = 0; i < keysize - 1; i++)
+    {
+        h = 33 * h ^ s[i];
+    }
+
+    return h % p->htSize;
+}
+*/
+
+/*
+int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+    const unsigned char *s = pKey;
+    unsigned h = 2166136261;
+    uint32_t i;
+
+    for (i = 0; i < keysize - 1; i++)
+    {
+        h = (h * 16777619) ^ s[i];
+    }    
+
+    return h % p->htSize;
+}
+*/
+
+/*
+int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+    const unsigned char *s = pKey;    
+    unsigned h = 0, g;
+    uint32_t i;
+
+    for (i = 0; i < keysize - 1; i++)
+    {
+        h = (h << 4) + s[i];
+        g = h & 0xf0000000L;
+
+        if (g != 0)
+        {
+            h ^= g >> 24;
+        }
+
+        h &= ~g;
+    }
+
+    return h % p->htSize;
+}
+*/
+
+/*
+int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+	unsigned n = 0;
+	const char* s = (const char*)pKey;
+	
+	UNUSED(keysize);
+	
+	for ( ; *s; s++)
+		n = 31 * n + *s;
+		
+	return n % p->htSize;
+}
+
+
+int StringCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint32_t keysize2)
+{
+	UNUSED(keysize1);
+	UNUSED(keysize2);
+	
+	return strncmp((char*)pKey1, (char*)pKey2, BLOCK_SIZE - 1);
+}
+*/
+
 int htInit(HashTable_t* p, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc)
 {
 	uint32_t x;
@@ -39,7 +149,7 @@ int htInit(HashTable_t* p, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc
 	p->pHashTable = NULL;
 	
 	p->htSize = htSize;
-	if ( p->htSize == 0 )
+	if ( 0 == p->htSize )
 		p->htSize = HT_SIZE;
 				
 	p->pHashTable = (HashTableItem_t**)malloc(sizeof(HashTableItem_t*) * p->htSize);
@@ -50,6 +160,7 @@ int htInit(HashTable_t* p, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc
 		p->pHashTable[x] = NULL;
 		
 	p->HashFunc = HashFunc;
+	
 	p->CompareFunc = CompareFunc;
 	
 	return 1;
@@ -346,117 +457,9 @@ void htTraverse(HashTable_t* p, pfnOnTraverse OnTraverse)
 	}		
 }
 
-/*
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
-{
-	int index = 0;
-	int a = 31415;
-	const char* s = (const char*)pKey;
-	
-	for(; *s; s++)
-		index = (a*index + *s) % p->htSize;
-				
-	return index;	
-}
-*/
-
-/*
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
-{
-    const unsigned char *s = pKey;
-    unsigned h = 0;
-    uint32_t i;
-
-    for (i = 0; i < keysize - 1; i++)
-    {
-        h ^= (h << 5) + (h >> 2) + s[i];
-    }
-
-    return h % p->htSize;
-}
-*/
-
-/*
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
-{
-    const unsigned char *s = pKey;
-    unsigned h = 0;
-    uint32_t i;
-
-    for (i = 0; i < keysize - 1; i++)
-    {
-        h = 33 * h ^ s[i];
-    }
-
-    return h % p->htSize;
-}
-*/
-
-/*
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
-{
-    const unsigned char *s = pKey;
-    unsigned h = 2166136261;
-    uint32_t i;
-
-    for (i = 0; i < keysize - 1; i++)
-    {
-        h = (h * 16777619) ^ s[i];
-    }    
-
-    return h % p->htSize;
-}
-*/
-
-/*
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
-{
-    const unsigned char *s = pKey;    
-    unsigned h = 0, g;
-    uint32_t i;
-
-    for (i = 0; i < keysize - 1; i++)
-    {
-        h = (h << 4) + s[i];
-        g = h & 0xf0000000L;
-
-        if (g != 0)
-        {
-            h ^= g >> 24;
-        }
-
-        h &= ~g;
-    }
-
-    return h % p->htSize;
-}
-*/
-
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
-{
-	unsigned n = 0;
-	const char* s = (const char*)pKey;
-	
-	UNUSED(keysize);
-	
-	for ( ; *s; s++)
-		n = 31 * n + *s;
-		
-	return n % p->htSize;
-}
-
-
-int StringCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint32_t keysize2)
-{
-	UNUSED(keysize1);
-	UNUSED(keysize2);
-	
-	return strncmp((char*)pKey1, (char*)pKey2, BLOCK_SIZE - 1);
-}
-
 // ----------------------------------------------------- Begin Scope Functions ---------------------------------------------------------
 
-int scopeInit(Scope *pScope)
+int  scopeInit(Scope* pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc)
 {
 	HashTable_t **pHT = NULL;
 	int x;
@@ -476,7 +479,7 @@ int scopeInit(Scope *pScope)
 				pHT = NULL;
 				return 0; 
 			}
-			if ( !(htInit(pHT[x], HT_SIZE, StringHashFunc, StringCompareFunc)) )
+			if ( !(htInit(pHT[x], htSize, HashFunc, CompareFunc)) )
 			{
 				printf("Errore scopeInit -> htInit.\n");
 				return -1;
@@ -497,7 +500,7 @@ int scopeInit(Scope *pScope)
 	return 1;
 }
 
-int scopePush(Scope *pScope)
+int scopePush(Scope *pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc)
 {
 	HashTable_t **pHT = NULL;
 	int x;
@@ -523,7 +526,7 @@ int scopePush(Scope *pScope)
 				pHT = NULL;
 				return 0; 
 			}
-			if ( !(htInit(pHT[x], HT_SIZE, StringHashFunc, StringCompareFunc)) )
+			if ( !(htInit(pHT[x], htSize, HashFunc, CompareFunc)) )
 			{
 				printf("Errore scopePush -> htInit.\n");
 				return -1;

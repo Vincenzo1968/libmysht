@@ -23,8 +23,11 @@
 #include <string.h>
 
 #include "myScopeHashTable.h"
+//#include "../src/myScopeHashTable.h"
 
 /*
+gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE ../src/myScopeHashTable.c sample02.c -o example02 
+
 gcc -Wall -W -pedantic -O2 -std=c99 -D_GNU_SOURCE sample02.c -o example02 -lmysht
 */
 
@@ -36,6 +39,28 @@ int myOnTraverse(const void* key, uint32_t keySize, void* data, uint32_t dataSiz
 		printf("'%s' keysize = %d\n", (char*)key, keySize);
 				
 	return 1;
+}
+
+int myHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
+{
+	unsigned n = 0;
+	const char* s = (const char*)pKey;
+	
+	UNUSED(keysize);
+	
+	for ( ; *s; s++)
+		n = 31 * n + *s;
+		
+	return n % p->htSize;
+}
+
+
+int myCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint32_t keysize2)
+{
+	UNUSED(keysize1);
+	UNUSED(keysize2);
+	
+	return strncmp((char*)pKey1, (char*)pKey2, BLOCK_SIZE - 1);
 }
 
 int main()
@@ -50,7 +75,7 @@ int main()
 		
 	int res;
 	
-	if ( !htInit(&myTable, 8191, StringHashFunc, StringCompareFunc) )
+	if ( !htInit(&myTable, 8191, myHashFunc, myCompareFunc) )
 	{
 		printf("Errore htInit.\n");
 		return -1;
