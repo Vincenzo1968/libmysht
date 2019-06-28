@@ -99,7 +99,7 @@ int main()
 	scopeInsert(&myScope, szKey, sizekey, szData, sizedata);
 	
 	printf("SCOPE PUSH\n");
-	scopePush(&myScope, 0, myHashFunc, myCompareFunc);
+	scopePush(&myScope);
 	
 	strcpy(szKey, "Ciao a tutti");
 	sizekey = strlen(szKey) + sizeof(char);

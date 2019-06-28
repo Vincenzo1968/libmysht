@@ -29,16 +29,6 @@
 #  define END_C_DECLS
 #endif /* __cplusplus */
 
-
-/*
-#ifdef _MSC_VER
-#define INLINE __forceinline // use __forceinline (VC++ specific) 
-#else
-#define INLINE inline        // use standard inline 
-#endif
-*/
-
-
 /*
 #define HT_SIZE 251
 #define HT_SIZE 509
@@ -91,6 +81,9 @@ typedef struct tagScope
 {
 	int top;
 	HashTable_t** stack[SCOPE_SIZE];
+	uint32_t          htSize;
+	pfnHashFunc       HashFunc;
+	pfnCompareFunc    CompareFunc;	
 } Scope;
 
 BEGIN_C_DECLS
@@ -110,14 +103,14 @@ void htTraverse(HashTable_t* p, pfnOnTraverse OnTraverse);
 HashTableItem_t* htNewNode(const void* pKey, uint32_t keysize, const void* pData, uint32_t datasize);
 void htFreeList(HashTableItem_t* first);
 
-int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize);
-int StringCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint32_t keysize2);
+//int StringHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize);
+//int StringCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint32_t keysize2);
 
 // ----------------------------------------------- Scope Functions -------------------------------------------------
 
 int  scopeInit(Scope* pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc);
 void scopeFree(Scope* pScope);
-int scopePush(Scope *pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc);
+int  scopePush(Scope *pScope);
 int  scopePop(Scope* pScope);
 int  scopeFind(Scope* pScope, void* pKey, uint32_t keysize, void* pData, uint32_t* datasize, int bOnlyTop);
 int  scopeInsert(Scope* pScope, void* pKey, uint32_t keysize, void* pData, uint32_t datasize);

@@ -142,7 +142,7 @@ int htInit(HashTable_t* p, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc
 	
 	if ( NULL == p )
 	{
-		printf("ERRORE htInit -> p È NULL\n");
+		//printf("ERROR htInit -> p is NULL\n");
 		return 0;
 	}
 	
@@ -192,7 +192,7 @@ HashTableItem_t* htNewNode(const void* pKey, uint32_t keysize, const void* pData
 	n->pKey = (uint8_t*)malloc(sizeof(uint8_t) * keysize);
 	if ( NULL == n->pKey )
 	{
-		printf("ERRORE htNewNode 1: memoria insufficiente\n");
+		//printf("ERROR htNewNode 1: insufficient memory\n");
 		free(n);
 		n = NULL;
 		return NULL;
@@ -205,7 +205,7 @@ HashTableItem_t* htNewNode(const void* pKey, uint32_t keysize, const void* pData
 		n->pData = (uint8_t*)malloc(sizeof(uint8_t) * datasize);
 		if ( NULL == n->pData )
 		{
-			printf("ERRORE htNewNode 2: memoria insufficiente\n");
+			//printf("ERROR htNewNode 2: insufficient memory\n");
 			free(n->pKey);
 			n->pKey = NULL;
 			free(n);
@@ -233,7 +233,7 @@ int htFind(HashTable_t* p, const void* pKey, uint32_t keysize, void* pData, uint
 		
 	if ( NULL == p )
 	{
-		printf("\n\nERRORE htFind -> p È NULL\n\n");
+		//printf("\n\nERROR htFind -> p is NULL\n\n");
 		return -2;
 	}	
 				
@@ -276,7 +276,7 @@ int htUpdateData(HashTable_t* p, const void* pKey, uint32_t keysize, const void*
 		
 	if ( NULL == p )
 	{
-		printf("\n\nERRORE htUpdateData -> p È NULL\n\n");
+		//printf("\n\nERROR htUpdateData -> p is NULL\n\n");
 		return -2;
 	}	
 				
@@ -297,7 +297,7 @@ int htUpdateData(HashTable_t* p, const void* pKey, uint32_t keysize, const void*
 					t->pData = (uint8_t*)malloc(sizeof(uint8_t) * datasize);
 					if ( NULL == t->pData )
 					{
-						printf("ERRORE htUpdateData: memoria insufficiente\n");
+						//printf("ERROR htUpdateData: insufficient memory\n");
 						return -2;
 					}					
 					
@@ -462,37 +462,44 @@ void htTraverse(HashTable_t* p, pfnOnTraverse OnTraverse)
 int  scopeInit(Scope* pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc)
 {
 	HashTable_t **pHT = NULL;
-	int x;
+	uint32_t x;
 
 	pScope->top = 0;
+	
+	if ( 0 == htSize )
+		htSize = HT_SIZE;
 
-	pHT = (HashTable_t**)malloc(sizeof(HashTable_t*) * HT_SIZE);
+	pHT = (HashTable_t**)malloc(sizeof(HashTable_t*) * htSize);
 	if ( pHT != NULL )
 	{
-		for ( x = 0; x < HT_SIZE; x++ )
+		for ( x = 0; x < htSize; x++ )
 		{
 			pHT[x] = (HashTable_t*)malloc(sizeof(HashTable_t));
 			if ( pHT[x] == NULL )
 			{
-				printf("ERRORE scopeInit: memoria non sufficiente.\n");
+				//printf("ERROR scopeInit: insufficient memory.\n");
 				free(pHT);
 				pHT = NULL;
 				return 0; 
 			}
 			if ( !(htInit(pHT[x], htSize, HashFunc, CompareFunc)) )
 			{
-				printf("Errore scopeInit -> htInit.\n");
+				//printf("ERROR scopeInit -> htInit.\n");
 				return -1;
 			}
 		}
 	}
 	else
 	{
-		printf("ERRORE scopeInit: memoria non sufficiente.\n");
+		//printf("ERROR scopeInit: insufficient memory.\n");
 		return 0;
 	}
 
 	pScope->stack[pScope->top] = pHT;
+	
+	pScope->htSize = htSize;
+	pScope->HashFunc = HashFunc;
+	pScope->CompareFunc = CompareFunc;
 	
 	for ( x = 1; x < SCOPE_SIZE; x++ )
 		pScope->stack[x] = NULL;
@@ -500,15 +507,15 @@ int  scopeInit(Scope* pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareF
 	return 1;
 }
 
-int scopePush(Scope *pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFunc CompareFunc)
+int scopePush(Scope *pScope)
 {
 	HashTable_t **pHT = NULL;
 	int x;
-
+	
 	pScope->top++;
 	if ( pScope->top > SCOPE_SIZE - 1 )
 	{
-		printf("ERRORE scopePush: scope stack pieno!\n");
+		//printf("ERROR scopePush: scope stack full!\n");
 		pScope->top = SCOPE_SIZE - 1;
 		return 0;
 	}
@@ -521,21 +528,21 @@ int scopePush(Scope *pScope, uint32_t htSize, pfnHashFunc HashFunc, pfnCompareFu
 			pHT[x] = (HashTable_t*)malloc(sizeof(HashTable_t));
 			if ( pHT[x] == NULL )
 			{
-				printf("ERRORE scopePush: memoria non sufficiente.\n");
+				//printf("ERROR scopePush: insufficient memory.\n");
 				free(pHT);
 				pHT = NULL;
 				return 0; 
 			}
-			if ( !(htInit(pHT[x], htSize, HashFunc, CompareFunc)) )
+			if ( !(htInit(pHT[x], pScope->htSize, pScope->HashFunc, pScope->CompareFunc)) )
 			{
-				printf("Errore scopePush -> htInit.\n");
+				//printf("ERROR scopePush -> htInit.\n");
 				return -1;
 			}
 		}
 	}
 	else
 	{
-		printf("ERRORE scopePush: memoria non sufficiente.\n");
+		//printf("ERROR scopePush: insufficient memory.\n");
 		return 0;
 	}
 			
@@ -596,7 +603,7 @@ void scopeFree(Scope* pScope)
 
 int scopeFind(Scope* pScope, void* pKey, uint32_t keysize, void* pData, uint32_t* datasize, int bOnlyTop)
 {
-	int retValue = -1; // non trovato
+	int retValue = -1; // not found
 	
 	HashTable_t** pHT = NULL;
 	int x;
@@ -641,7 +648,7 @@ int scopeInsert(Scope* pScope, void* pKey, uint32_t keysize, void* pData, uint32
 	
 	if ( htFind(*pHT, pKey, keysize, &Dati, &sizeDati) >= 0 )
 	{
-		printf("Errore scopeInsert: la variabile '%s' e' gia' stata dichiarata nello scope %d\n", (char*)pKey, pScope->top);
+		//printf("ERROR scopeInsert: the variable '% s' has already been declared in scope %d\n", (char*)pKey, pScope->top);
 		return 0;
 	}
 
@@ -670,7 +677,7 @@ int scopeUpdateValue(Scope* pScope, const void* pKey, uint32_t keysize, const vo
 			break;
 	}
 
-	printf("ERRORE scopeUpdateValue: variabile '%s' non presente nello scope\n", (char*)pKey);
+	//printf("ERROR scopeUpdateValue: variable '%s' not found in scope\n", (char*)pKey);
 	
 	return 0;
 }

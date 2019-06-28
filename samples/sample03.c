@@ -33,20 +33,30 @@ typedef struct tagPerson_t
 	int  nAge;
 } Person_t;
 
+uint32_t MakeKey(const char* szFirstName, const char* szLastName, char* szKey)
+{
+	uint32_t k = 0;
+	
+	strncpy(szKey, szLastName, 128);
+	strncat(szKey, szFirstName, 128);
+		
+	while ( '\0' != szKey[k] )
+	{
+		szKey[k] = tolower( (int)szKey[k] );
+		k++;
+	}
+	
+	return k;
+}
+
 int myHashFunc(HashTable_t* p, const void* pKey, uint32_t keysize)
 {
 	unsigned n = 0;
-	const Person_t* pPers = (const Person_t*)pKey;
-	
-	char szKey[256];
 	const char* s;
 	
 	UNUSED(keysize);
 	
-	strncpy(szKey, pPers->szLastName, 128);
-	strncat(szKey, pPers->szFirstName, 128);
-	
-	s = (const char*)szKey;
+	s = (const char*)pKey;
 	
 	for ( ; *s; s++)
 		n = 31 * n + *s;
@@ -60,33 +70,17 @@ int myCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint3
 	UNUSED(keysize1);
 	UNUSED(keysize2);
 	
-	const Person_t* pPers1 = (const Person_t*)pKey1;
-	const Person_t* pPers2 = (const Person_t*)pKey2;
+	const char* pPers1 = (const char*)pKey1;
+	const char* pPers2 = (const char*)pKey2;
 	
 	int res;
 	
-	res = strncmp(pPers1->szLastName, pPers2->szLastName, 127);
-	if ( 0 == res )
-		res = strncmp(pPers1->szFirstName, pPers2->szFirstName, 127);
+	res = strncmp(pPers1, pPers2, 127);
 		
 	return res;
 }
 
-uint32_t MakeKey(const char* szFirstName, const char* szLastName, char* szKey)
-{
-	uint32_t k = 0;
-	
-	strncpy(szKey, szLastName, 127);
-	strncat(szKey, szFirstName, 127);
-		
-	while ( '\0' != szKey[k] )
-	{
-		szKey[k] = tolower( (int)szKey[k] );
-		k++;
-	}
-	
-	return k;
-}
+
 
 /*
 gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE ../src/myScopeHashTable.c sample03.c -o example03
@@ -103,7 +97,6 @@ int main()
 	Scope myScope;
 	
 	char szKey[256];
-	//char szData[256];
 	
 	Person_t myPers;
 	
@@ -139,7 +132,7 @@ int main()
 		if ( 2 == k )
 		{
 			printf("SCOPE PUSH\n");
-			scopePush(&myScope, 0, myHashFunc, myCompareFunc);
+			scopePush(&myScope);
 		}
 	}	
 	
@@ -181,7 +174,7 @@ int main()
 	if ( res >= 0 )
 		printf("Record Key('%s') found: data -> First Name = '%s', Last Name = '%s', Age = %d; datasize = %d\n", szKey, myPers.szFirstName, myPers.szLastName, myPers.nAge, sizedata);
 	else
-		printf("Record '%s' not found.\n", szKey);
+		printf("Record Key('%s') not found.\n", szKey);
 
 	sizekey = MakeKey("Tom", "Cruise", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
