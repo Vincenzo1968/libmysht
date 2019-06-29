@@ -80,13 +80,16 @@ int myCompareFunc(const void* pKey1, uint32_t keysize1, const void* pKey2, uint3
 	return res;
 }
 
-
-
 /*
 gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE ../src/myScopeHashTable.c sample03.c -o example03
 
-gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE -I/$HOME/MyLibs/libmysht/include -L/$HOME/MyLibs/libmysht/lib sample03.c -o example03 -lmysht
+export INCLUDE=$HOME/MyLibs/libmysht/include
+export LIBRARY_PATH=$HOME/MyLibs/libmysht/lib
 export LD_LIBRARY_PATH=$HOME/MyLibs/libmysht/lib:$LD_LIBRARY_PATH
+gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE -I$INCLUDE -L/$LIBRARY_PATH sample03.c -o example03 -lmysht
+ 
+gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE -I/$HOME/MyLibs/libmysht/include -L/$HOME/MyLibs/libmysht/lib sample03.c -o example03 -lmysht
+
 ./example03
 
 gcc -Wall -W -pedantic -O3 -std=c99 -D_GNU_SOURCE sample03.c -o example03 -lmysht
@@ -126,7 +129,7 @@ int main()
 	for ( k = 0; k < 5; k++ )
 	{
 		sizekey = MakeKey(aPersons[k].szFirstName, aPersons[k].szLastName, szKey);
-		printf("SCOPE INSERT Key -> ('%s'), First Name = '%s', Last Name = '%s', Age = %d\n", szKey, aPersons[k].szFirstName, aPersons[k].szLastName, aPersons[k].nAge);
+		printf("SCOPE INSERT Key('%s'): First Name = '%s', Last Name = '%s', Age = %d\n", szKey, aPersons[k].szFirstName, aPersons[k].szLastName, aPersons[k].nAge);
 		scopeInsert(&myScope, szKey, sizekey, &(aPersons[k]), sizeof(Person_t));
 		
 		if ( 2 == k )
@@ -137,7 +140,7 @@ int main()
 	}	
 	
 	printf("----------------------------------------------------------------------------------------\n");
-	
+	printf("Search for record:\n\n");
 	
 	sizekey = MakeKey("Johnny", "Depp", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
@@ -167,7 +170,7 @@ int main()
 	printf("SCOPE POP\n");
 	scopePop(&myScope);
 		
-	printf("After scopePop:\n");
+	printf("Search for record after scopePop:\n\n");
 	
 	sizekey = MakeKey("Johnny", "Depp", szKey);
 	res = scopeFind(&myScope, szKey, sizekey, &myPers, &sizedata, 0);
